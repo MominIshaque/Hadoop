@@ -39,7 +39,7 @@ sudo chown -R hduser:hadoop /usr/local/hadoop
 
 # Set Enviornment Variable
 # readlink -f $(which java)
-nano ~/.bashrc
+~/ nano .bashrc
 
 export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
 export HADOOP_HOME=/usr/local/hadoop
@@ -52,14 +52,16 @@ export HADOOP_HDFS_HOME=$HADOOP_HOME
 export YARN_HOME=$HADOOP_HOME
 export HADOOP_CONF_DIR=/usr/local/hadoop/etc/hadoop
 
-source ~/.bashrc
+~/ source .bashrc
 
 cd /usr/local/hadoop/etc/hadoop/
 
 #Update hadoop-env.sh
 nano hadoop-env.sh
+
 export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
 export HADOOP_LOG_DIR=/var/log/hadoop
+
 sudo mkdir /var/log/hadoop/
 sudo chown -R hduser:hadoop /var/log/hadoop
 
@@ -132,10 +134,10 @@ sudo service ssh restart
  source .profile
  
 
-----------****** Create a snapshot at this point ******-----------------
-Create 4 nodes from this image
+----------****** Create a AMI at this point ******-----------------
+***Create 4 nodes from this image***
 
-#sudo nano /etc/hosts and include these lines:FQDN
+#sudo nano /etc/hosts (and include these lines:FQDN)
 172.31.29.56 ip-172-31-29-56.ec2.internal nn
 172.31.27.96 ip-172-31-27-96.ec2.internal rm
 172.31.18.137 ip-172-31-18-137.ec2.internal 1dn
@@ -169,15 +171,18 @@ nano workers
 3dn
 
 #Update core-site.xml
+
 nano core-site.xml
 <property>
     <name>fs.defaultFS</name>
     <value>hdfs://nn:9000</value>
   </property>
 
+
 #Update hdfs-site.xml on name node 
 mkdir -p /usr/local/hadoop/data/hdfs/namenode
 nano hdfs-site.xml
+
 <property>
     <name>dfs.replication</name>
     <value>3</value>
@@ -199,6 +204,7 @@ dsh -m 1dn,2dn,3dn mkdir -p /usr/local/hadoop/data/hdfs/datanode
 
 #Update yarn-site.xml
 nano yarn-site.xml
+
 <property>
     <name>yarn.nodemanager.aux-services</name>
     <value>mapreduce_shuffle</value>
@@ -214,8 +220,8 @@ nano yarn-site.xml
 
 
 #Update mapred-site.xml
-
 nano mapred-site.xml
+
 <property>
     <name>mapreduce.jobtracker.address</name>
     <value>rm:54311</value>
@@ -243,7 +249,9 @@ sudo chown -R hduser:hadoop $HADOOP_HOME
 cd /usr/local/hadoop/etc/hadoop
 For all nodes
 scp core-site.xml hdfs-site.xml mapred-site.xml yarn-site.xml workers rm:/usr/local/hadoop/etc/hadoop
-
+scp core-site.xml hdfs-site.xml mapred-site.xml yarn-site.xml workers 1dn:/usr/local/hadoop/etc/hadoop
+scp core-site.xml hdfs-site.xml mapred-site.xml yarn-site.xml workers 2dn:/usr/local/hadoop/etc/hadoop
+scp core-site.xml hdfs-site.xml mapred-site.xml yarn-site.xml workers 3dn:/usr/local/hadoop/etc/hadoop
 
 
 #Format Namenode
@@ -251,13 +259,24 @@ scp core-site.xml hdfs-site.xml mapred-site.xml yarn-site.xml workers rm:/usr/lo
 hdfs namenode -format
 
 
-# Start the cluster
+# Starting the cluster
+# on NN
 start-dfs.sh
+#on RM
+ssh rm
 start-yarn.sh
- 
+
+jps
 dsh -a jps
 
+##checking NN web ui
+NN Private ip:9870
 
+##checking RM web ui
+RM Public ip:8088
+
+
+## for testing
 hdfs dfs -mkdir /user
 hdfs dfs -mkdir /user/ubuntu
 hdfs dfs -put hadoop-3.3.4o apt .tar.gz /user/ubuntu
