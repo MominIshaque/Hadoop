@@ -1,2 +1,0 @@
-# MyHadoop
-Hadoop data
