@@ -19,7 +19,7 @@ sudo adduser hduser sudo
 sudo su hduser
 
 #Configure SSH
-ssh-keygen
+ssh-keygen (/home/hduser/.ssh/id_rsa)
 cd .ssh
 cat id_rsa.pub >> authorized_keys
 ssh localhost
